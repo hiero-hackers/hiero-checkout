@@ -1,0 +1,26 @@
+{
+  "name": "@hiero-hackers/hiero-checkout",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Payer-facing checkout for Hiero payments — a static page that turns a payment QR or link into a wallet action and a live paid-check. No backend, no keys, no analytics.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "setup:local": "node scripts/setup-local.mjs",
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "verify": "npm run typecheck && npm test && vite build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^5.5.0",
+    "vite": "^7.3.2",
+    "vitest": "^4.0.0"
+  }
+}

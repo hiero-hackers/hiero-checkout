@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "checkout",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "/Users/sophiebulloch/hiero/hiero-hackers/hiero-checkout",
+      "port": 5173
+    }
+  ]
+}
