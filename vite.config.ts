@@ -28,6 +28,9 @@ const CSP = [
 ].join("; ");
 
 export default defineConfig({
+  // Relative asset paths: GitHub Pages serves this from /hiero-checkout/,
+  // not the domain root — absolute /assets/… URLs 404 there.
+  base: "./",
   plugins: [
     {
       name: "inject-csp",
