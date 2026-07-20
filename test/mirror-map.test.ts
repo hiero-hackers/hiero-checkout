@@ -46,7 +46,10 @@ describe("REST row → receipts → payment-requests → verdict", () => {
   });
 
   it("the full pipeline reaches `paid` — same verdict the merchant computes", () => {
-    const receipt = receiptFor("0.0.1234", fromMirror(toTransactionInfo(restRow), { network: "mainnet" }));
+    const receipt = receiptFor(
+      "0.0.1234",
+      fromMirror(toTransactionInfo(restRow), { network: "mainnet" }),
+    );
     const payment = fromReceipt(receipt, "mainnet");
     expect(match(request, [payment])).toMatchObject({
       status: "paid",

@@ -11,13 +11,10 @@ import { describe, expect, it } from "vitest";
 import { fromAny, paymentInstructions, toLink, toURI } from "@hiero-hackers/hiero-payment-requests";
 import type { PaymentRequest } from "@hiero-hackers/hiero-payment-requests";
 
-// The vectors file ships in the package but isn't an exports subpath (yet) —
-// resolve it relative to the package's own package.json.
+// The official vectors, via their exports subpath (added in 0.1.1 after this
+// very file had to path-hack its way to them — first-consumer feedback loop).
 const require = createRequire(import.meta.url);
-const vectorsPath = require
-  .resolve("@hiero-hackers/hiero-payment-requests/package.json")
-  .replace(/package\.json$/, "vectors/wire.v1.json");
-const vectors = require(vectorsPath) as {
+const vectors = require("@hiero-hackers/hiero-payment-requests/vectors/wire.v1.json") as {
   valid: { name: string; uri: string; request: Record<string, string> }[];
   invalid: { name: string; uri: string; reason: string }[];
 };

@@ -8,30 +8,87 @@ universal-link target for [`toLink`](https://github.com/hiero-hackers/hiero-paym
 a phone that scans a payment QR opens this page, and the page does the rest.
 Prototype.
 
-```
-URL #fragment           parse (library)          act (wallet)         confirm (browser)
-#hiero-pay:…      →   fromAny → request    →   open in wallet /  →  poll mirror → receipts
-                      card + QR                copy / scan          → match → paid ✓
+```mermaid
+flowchart LR
+    A["#fragment<br/>hiero-pay: URI"] --> B["fromAny<br/>validate + render card"]
+    B --> C["wallet pays<br/>(page never holds keys)"]
+    C --> D["mirror poll → receipts<br/>→ match"]
+    D --> E["paid ✓<br/>proof links + receipt"]
+    D -->|underpaid| F["remainder QR<br/>same reference"] --> C
+    M["#create<br/>merchant builder"] -->|link + QR| A
 ```
 
-## Why it's this small (13 kB gzipped, everything included)
+## See every state, right now
+
+```sh
+npm install && npm run dev   # → http://localhost:5173
+```
+
+| State                                             | URL                                                                                                                                                                   |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **The whole lifecycle, simulated, in 20 seconds** | `/#tour` — request → partial payment + remainder QR → settled with proof + receipt. Real matcher, real renderers; only the data is simulated, and the banner says so. |
+| Landing / paste screen                            | `/` (has a **Try a demo** button — a live testnet request)                                                                                                            |
+| Merchant builder                                  | `/#create` — link + QR appear as you type, checksum added for you                                                                                                     |
+| Payer card, live watching                         | any `#hiero-pay:` fragment, or **Open checkout** from the builder                                                                                                     |
+| Expired request                                   | builder → expires in 1 minute → wait                                                                                                                                  |
+| Damaged link                                      | `/#hiero-pay:hedera:mainnet:0.0.1234-wrong?v=1&asset=hedera%3Amainnet%2Ftoken%3A0.0.720&amount=1&ref=X`                                                               |
+| Dark mode / mobile                                | OS theme; narrow the window (the QR folds away on phones)                                                                                                             |
+
+## The walkthrough, in pictures
+
+**1 · Choose your side.** Payers usually never see this — a payment link drops
+them straight onto the request. Merchants tap Create; the curious take the
+tour or the live demo.
+
+<img src="docs/screenshots/landing.png" width="420" alt="Landing: Pay or Receive role chooser" />
+
+**2 · Merchant: create the request.** Network defaults to testnet (faucet
+money), the checksum and token decimals are computed for you, the amount is
+grounded in exact base units with a $ estimate, and expiry is a human
+duration. Out comes a link + QR — send either to whoever owes you; that's how
+a request is "addressed".
+
+<img src="docs/screenshots/builder.png" width="420" alt="Builder: create a payment request form" />
+
+**3 · Payer: review and pay.** Everything verified before it's shown —
+checksummed recipient, exact amount, the required memo one tap from the
+clipboard. On testnet, **Pay now** pairs with a wallet (HashPack, Kabila,
+Blade) over WalletConnect and the wallet signs; the page then watches the
+public mirror until the verdict flips to paid ✓ — with on-chain proof links
+and a downloadable receipt.
+
+<img src="docs/screenshots/payer.png" width="420" alt="Payer card: verified request, Pay now, live watching" />
+
+**4 · Need paper?** Any request renders as a printable invoice — the
+reference is the invoice number, the QR is the payment instruction.
+
+<img src="docs/screenshots/invoice.png" width="420" alt="Invoice view: printable pre-payment document" />
+
+(Screenshots are reproducible output, not relics: `npm run screenshots`
+against a running dev server regenerates them.)
+
+## Why it's this small (~21 kB gzipped to first paint)
 
 Everything hard ships in the published libraries; this repo is glue:
 
-| Concern | Where it lives |
-| --- | --- |
-| Parse scanned/pasted/linked input | `fromAny` — payment-requests |
-| Validate (checksums, networks, amounts) | `createRequest` via every entry point |
-| What to show + hand a wallet | `paymentInstructions` |
-| The QR itself | `toQRSVG` — the in-house, decoder-verified encoder |
-| Amounts as text, no floats | `formatBaseUnits` |
-| Normalize mirror transactions (net credits, custom fees) | `fromMirror` + `receiptFor` — hiero-receipts |
-| The verdict | `match` — the SAME rule the merchant runs; the two ends cannot disagree |
-| The keepsake | `toHTML` — hiero-receipts renders the downloadable receipt |
+| Concern                                                  | Where it lives                                                                    |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Parse scanned/pasted/linked input                        | `fromAny` — payment-requests                                                      |
+| Validate (checksums, networks, amounts)                  | `createRequest` via every entry point                                             |
+| What to show + hand a wallet                             | `paymentInstructions`                                                             |
+| The QR itself                                            | `toQRSVG` — the in-house, decoder-verified encoder                                |
+| Amounts as text, no floats                               | `formatBaseUnits`                                                                 |
+| Normalize mirror transactions (net credits, custom fees) | `fromMirror` + `receiptFor` — hiero-receipts                                      |
+| The verdict                                              | `match` — the SAME rule the merchant runs; the two ends cannot disagree           |
+| The keepsake                                             | `toHTML` — hiero-receipts renders the downloadable receipt                        |
+| Pay in-page (testnet only)                               | `@hashgraph/hedera-wallet-connect` — the WALLET signs; this page never holds keys |
 
-The page adds ~500 lines: a thin typed `fetch` for two mirror endpoints
-(deliberately not a data-client dependency), a poll loop, and framework-free
-DOM rendering — one screen, four states, no virtual DOM required.
+The page adds ~1,400 lines: a thin typed `fetch` for three mirror endpoints
+(deliberately not a data-client dependency), a poll loop, framework-free DOM
+rendering, and the WalletConnect hand-off. The wallet stack itself is
+LAZY-LOADED chunks — payers who never tap Pay now never download or execute
+it, and in-page payment is **testnet-only** while this is a prototype
+([src/config.ts](src/config.ts)).
 
 ## Privacy properties (the point of the design)
 
@@ -46,16 +103,11 @@ DOM rendering — one screen, four states, no virtual DOM required.
 ## Develop
 
 ```sh
-npm install
-npm run setup:local   # packs ../hiero-payment-requests + ../hiero-receipts
+npm install           # @hiero-hackers packages come from GitHub Packages —
+                      # you need the usual read:packages token in ~/.npmrc
 npm run dev           # → http://localhost:5173
-npm run verify        # typecheck + tests + build
+npm run verify        # typecheck + lint + format + tests + build + dist checks
 ```
-
-Until the `@hiero-hackers` packages publish to a registry this repo can
-resolve, `setup:local` installs them as real tarballs from the sibling
-checkouts (`--no-save`, so package.json stays registry-ready). **Note:** any
-later `npm install <pkg>` prunes them — just re-run `setup:local`.
 
 Try it with a request: `npm run dev`, then open
 
@@ -69,9 +121,10 @@ valid vector must render, every invalid one must be refused.
 
 ## Roadmap
 
-- **WalletConnect** (`@hashgraph/hedera-wallet-connect`) — lazy-loaded pairing
-  in `src/wallets/`, needs a WalletConnect Cloud project id. Deep links per
-  wallet land in the same directory, where churn is contained.
+- ~~WalletConnect~~ **DONE** — "Pay now" pairs via
+  `@hashgraph/hedera-wallet-connect` (lazy-loaded; the entry stays ~21 kB
+  gzipped), proposes the transfer with the memo intact, and the wallet signs.
+  Remaining: a real-device pass with HashPack on testnet.
 - **GitHub Pages deploy** + CI (verify gates, SPDX/browser drift checks — kit
   parity with the sibling repos).
 - **Underpaid → remainder QR** via `remainderRequest` (the library call

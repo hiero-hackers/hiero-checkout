@@ -4,7 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
+    <!-- CSP is injected at BUILD time (vite.config.ts) so dev HMR still works;
+         scripts/check-dist.mjs fails the build if it goes missing. -->
     <title>Hiero Checkout</title>
+    <meta
+      name="description"
+      content="Review and pay a Hiero payment request. The request stays in your browser — link previews and servers never see it."
+    />
+    <meta property="og:title" content="Hiero Checkout" />
+    <meta
+      property="og:description"
+      content="Review and pay a Hiero payment request — details stay on your device."
+    />
+    <meta name="theme-color" content="#4f46e5" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⬒</text></svg>"
+    />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>

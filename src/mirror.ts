@@ -9,14 +9,10 @@
  * identifiers — this page has no configuration.
  */
 
-const MIRRORS: Record<string, string> = {
-  mainnet: "https://mainnet.mirrornode.hedera.com",
-  testnet: "https://testnet.mirrornode.hedera.com",
-  previewnet: "https://previewnet.mirrornode.hedera.com",
-};
+import { MIRROR_HOSTS } from "./config.js";
 
 export function mirrorFor(network: string): string {
-  const host = MIRRORS[network];
+  const host = MIRROR_HOSTS[network];
   if (host === undefined) {
     throw new Error(`no public mirror node for "${network}" — this page cannot watch it`);
   }
@@ -119,6 +115,28 @@ export async function tokenDecimals(network: string, tokenId: string): Promise<n
     const body = (await response.json()) as { decimals?: string | number };
     const parsed = Number(body.decimals);
     return Number.isInteger(parsed) && parsed >= 0 ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The network's own HBAR↔cents rate — for a clearly-labeled estimate only.
+ *  All-bigint math; returns undefined rather than guessing on failure. */
+export async function usdEstimateCents(
+  network: string,
+  tinybar: bigint,
+): Promise<bigint | undefined> {
+  try {
+    const response = await fetch(`${mirrorFor(network)}/api/v1/network/exchangerate`);
+    if (!response.ok) return undefined;
+    const body = (await response.json()) as {
+      current_rate?: { cent_equivalent?: number; hbar_equivalent?: number };
+    };
+    const cents = body.current_rate?.cent_equivalent;
+    const hbar = body.current_rate?.hbar_equivalent;
+    if (!cents || !hbar) return undefined;
+    // tinybar → whole cents: amount × (cents/hbar) ÷ 10^8, all in bigint.
+    return (tinybar * BigInt(Math.trunc(cents))) / (BigInt(Math.trunc(hbar)) * 100_000_000n);
   } catch {
     return undefined;
   }
