@@ -12,7 +12,7 @@ import {
   toQRSVG,
   toURI,
 } from "@hiero-hackers/hiero-payment-requests";
-import type { Fulfilment, PaymentRequest } from "@hiero-hackers/hiero-payment-requests";
+import type { Fulfilment, PaymentRequest, Payment } from "@hiero-hackers/hiero-payment-requests";
 import { toHTML } from "@hiero-hackers/hiero-receipts";
 import type { Receipt } from "@hiero-hackers/hiero-receipts";
 import { canPayInPage } from "../config.js";
@@ -249,7 +249,7 @@ export function renderFulfilment(
         .map(
           (entry) =>
             `<li><a href="${esc(entry.href!)}" target="_blank" rel="noopener noreferrer">` +
-            `${esc(entry.payment.transactionId)}</a></li>`,
+            `${esc(entry.payment.transactionId)}</a> ${railChip(entry.payment, request.reference)}</li>`,
         )
         .join("");
       verdict.innerHTML =
@@ -268,6 +268,18 @@ export function renderFulfilment(
       return;
     }
   }
+}
+
+/**
+ * The payment RAIL, badged by evidence the chain can show — not a claim
+ * about who (a human can run an agent; an agent can drive a wallet):
+ * a memo carrying the reference is the wallet/checkout rail; its absence
+ * on a correlated payment means a sponsored machine rail (x402-style).
+ */
+function railChip(payment: Payment, reference: string): string {
+  return payment.memo.includes(reference)
+    ? '<span class="chip ok" translate="no">wallet rail · memo matched</span>'
+    : '<span class="chip" translate="no">machine rail · no memo</span>';
 }
 
 function downloadReceipt(receipt: Receipt): void {

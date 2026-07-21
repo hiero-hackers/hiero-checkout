@@ -112,6 +112,27 @@ describe("the state machine shows facts and refuses guesses", () => {
     expect(document.querySelector("#pay-actions a.button")?.className).not.toContain("primary");
   });
 
+  it("a correlated payment WITHOUT the memo badges the machine rail", () => {
+    renderRequest(BASE, DISPLAY);
+    // byUniqueAmount-style: correlated by amount, memo empty (x402-shaped).
+    const machinePaid: Fulfilment = match(BASE, [pay(100_000000n)], {
+      correlate: (payments) => payments,
+    });
+    const memoless = { ...machinePaid } as Fulfilment;
+    renderFulfilment(
+      BASE,
+      "payments" in memoless
+        ? ({
+            ...memoless,
+            payments: memoless.payments.map((p) => ({ ...p, memo: "" })),
+          } as Fulfilment)
+        : memoless,
+      DISPLAY,
+      [],
+    );
+    expect(document.getElementById("verdict")?.textContent).toContain("machine rail · no memo");
+  });
+
   it("unpaid keeps the watching pulse — no verdict yet is not a verdict", () => {
     renderRequest(BASE, DISPLAY);
     renderFulfilment(BASE, { status: "unpaid" }, DISPLAY, []);
@@ -135,6 +156,9 @@ describe("the state machine shows facts and refuses guesses", () => {
     const paid: Fulfilment = match(BASE, [pay(100_000000n)]);
     renderFulfilment(BASE, paid, DISPLAY, []);
     expect(document.getElementById("status")?.className).toContain("paid");
+    // The RAIL chip: evidence-based (memo carried the reference), never a
+    // human-vs-AI identity claim.
+    expect(document.getElementById("verdict")?.textContent).toContain("wallet rail · memo matched");
     expect(document.getElementById("receipt")).toBeNull();
     const receipt = receiptFor(
       "0.0.1234",
