@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // @vitest-environment happy-dom
 /** views/invoice.ts — the printable pre-payment document. */
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderInvoice } from "../../src/ui.js";
 import { MAINNET_REQUEST as BASE, USDC_DISPLAY as DISPLAY } from "../helpers.js";
 
@@ -19,5 +19,17 @@ describe("the invoice view", () => {
     expect(document.body.textContent).toContain("include it with your transfer");
     expect(document.querySelector(".qr svg")).not.toBeNull();
     expect(document.getElementById("inv-print")).not.toBeNull();
+  });
+
+  it("the Print button prints", () => {
+    renderInvoice(BASE, DISPLAY);
+    const print = vi.fn();
+    vi.stubGlobal("print", print);
+    try {
+      document.getElementById("inv-print")!.click();
+      expect(print).toHaveBeenCalledOnce();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

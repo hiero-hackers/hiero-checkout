@@ -2,7 +2,7 @@
   "name": "@hiero-hackers/hiero-checkout",
   "version": "0.0.1",
   "private": true,
-  "description": "Payer-facing checkout for Hiero payments \u2014 a static page that turns a payment QR or link into a wallet action and a live paid-check. No backend, no keys, no analytics.",
+  "description": "Payer-facing checkout for Hiero payments — a static page that turns a payment QR or link into a wallet action and a live paid-check. No backend, no keys, no analytics.",
   "type": "module",
   "license": "Apache-2.0",
   "engines": {
@@ -40,7 +40,7 @@
   "dependencies": {
     "@hashgraph/hedera-wallet-connect": "^2.1.3",
     "@hiero-hackers/hiero-payment-requests": "^0.1.0",
-    "@hiero-hackers/hiero-receipts": "^0.1.0",
+    "@hiero-hackers/hiero-receipts": "^0.2.0",
     "buffer": "^6.0.3"
   }
 }
