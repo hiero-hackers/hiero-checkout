@@ -9,12 +9,13 @@
  * decimals arrive. A payer who just scanned a QR never stares at a blank
  * page because a mirror request is round-tripping.
  */
-import { fromAny, paymentInstructions } from "@hiero-hackers/hiero-payment-requests";
+import { paymentInstructions } from "@hiero-hackers/hiero-payment-requests";
 import type { PaymentRequest } from "@hiero-hackers/hiero-payment-requests";
 import { renderBuilder } from "./builder.js";
 import { watchFulfilment } from "./confirm.js";
 import { tokenDecimals, usdEstimateCents } from "./mirror.js";
 import { route } from "./route.js";
+import { parseRequest } from "./x402.js";
 import { runTour } from "./tour.js";
 import {
   ageChecked,
@@ -41,7 +42,7 @@ function provisionalDisplay(request: PaymentRequest): DisplayContext {
 function present(text: string): void {
   let request: PaymentRequest;
   try {
-    request = fromAny(text);
+    request = parseRequest(text);
   } catch (error) {
     renderError(error instanceof Error ? error.message : String(error));
     return;
@@ -101,7 +102,7 @@ function present(text: string): void {
 function presentInvoice(text: string): void {
   let request: PaymentRequest;
   try {
-    request = fromAny(text);
+    request = parseRequest(text);
   } catch (error) {
     renderError(error instanceof Error ? error.message : String(error));
     return;

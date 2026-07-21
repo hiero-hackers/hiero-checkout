@@ -23,7 +23,7 @@ export function renderLanding(onSubmit: (text: string) => void): void {
           does the sending.</p>
           <details class="tech">
             <summary>Got the request as text instead? Paste it</summary>
-            <textarea id="paste" placeholder="hiero-pay:hedera:mainnet:0.0…"
+            <textarea id="paste" placeholder="hiero-pay:hedera:mainnet:0.0… — or an x402 challenge"
               aria-label="payment request"></textarea>
             <div class="actions"><button class="primary" id="go">Review request</button></div>
           </details>
