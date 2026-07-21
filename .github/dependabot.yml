@@ -7,6 +7,13 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: development
+    ignore:
+      # TypeScript majors are toolchain events, not routine bumps: the 7.x
+      # native compiler drops the JS API that typescript-eslint loads, so
+      # the major is adopted deliberately once the toolchain supports it.
+      # (Same rule as hiero-receipts — and the reason PR #2 ERESOLVEs.)
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:

@@ -28,6 +28,7 @@ npm install && npm run dev   # → http://localhost:5173
 | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **The whole lifecycle, simulated, in 20 seconds** | `/#tour` — request → partial payment + remainder QR → settled with proof + receipt. Real matcher, real renderers; only the data is simulated, and the banner says so. |
 | Landing / paste screen                            | `/` (has a **Try a demo** button — a live testnet request)                                                                                                            |
+| **An agent's x402 challenge, human-payable**      | paste a 402 body — or the raw base64 `payment-required` header — into the box (or put it in the `#fragment`); it renders as a verified payer card                     |
 | Merchant builder                                  | `/#create` — link + QR appear as you type, checksum added for you                                                                                                     |
 | Payer card, live watching                         | any `#hiero-pay:` fragment, or **Open checkout** from the builder                                                                                                     |
 | Expired request                                   | builder → expires in 1 minute → wait                                                                                                                                  |
@@ -73,7 +74,7 @@ Everything hard ships in the published libraries; this repo is glue:
 
 | Concern                                                  | Where it lives                                                                    |
 | -------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Parse scanned/pasted/linked input                        | `fromAny` — payment-requests                                                      |
+| Parse scanned/pasted/linked input                        | `fromAny` + `fromX402` — payment-requests (x402 challenges become payer cards)    |
 | Validate (checksums, networks, amounts)                  | `createRequest` via every entry point                                             |
 | What to show + hand a wallet                             | `paymentInstructions`                                                             |
 | The QR itself                                            | `toQRSVG` — the in-house, decoder-verified encoder                                |

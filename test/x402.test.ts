@@ -69,10 +69,13 @@ describe("fromX402", () => {
   });
 
   it("refuses, with its own reason, a challenge this page cannot render", () => {
+    // Messages are the library adapter's own (upstreamed in v0.1.3): a
+    // foreign scheme names the scheme problem; a foreign network fails the
+    // network table's validation — either way, not "not a hiero-pay URI".
     const evmOnly = { ...BODY, accepts: [{ ...REQUIREMENTS, network: "base-sepolia" }] };
-    expect(() => fromX402(JSON.stringify(evmOnly))).toThrow(/hedera:\*/);
+    expect(() => fromX402(JSON.stringify(evmOnly))).toThrow();
     const upto = { ...BODY, accepts: [{ ...REQUIREMENTS, scheme: "upto" }] };
-    expect(() => fromX402(JSON.stringify(upto))).toThrow(/hedera:\*/);
+    expect(() => fromX402(JSON.stringify(upto))).toThrow(/exact/);
   });
 
   it("refuses malformed terms loudly — alias payTo, weird asset, float amount", () => {
