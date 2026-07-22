@@ -11,12 +11,17 @@ import { app } from "./shared.js";
  */
 export function renderLanding(onSubmit: (text: string) => void): void {
   app().innerHTML = `
-    <div class="card">
-      <h1>Hiero Checkout</h1>
-      <p class="tagline">Pay — or get paid — on Hedera, right from this page.
-      No accounts, no keys, nothing stored. <span class="chip">prototype</span></p>
+    <div class="card landing">
+      <div class="landing__hero">
+        <h1>Pay — or get paid — on Hedera</h1>
+        <p class="tagline">Right from this page. No accounts, no keys, nothing stored.
+        <span class="chip">prototype</span></p>
+      </div>
       <div class="roles">
         <section class="role">
+          <span class="role__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          </span>
           <h2>Pay</h2>
           <p class="note">Open the payment link or scan the QR you were given — this page
           shows you exactly who you're paying and how much, verified, and your wallet
@@ -29,6 +34,9 @@ export function renderLanding(onSubmit: (text: string) => void): void {
           </details>
         </section>
         <section class="role">
+          <span class="role__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"/><path d="M16 17H7V8"/></svg>
+          </span>
           <h2>Receive</h2>
           <p class="note">Make a payment link + QR that pays your account — send it to
           whoever owes you, watch it get paid live.</p>
