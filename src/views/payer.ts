@@ -20,6 +20,15 @@ import { isConfigured as walletConfigured, payWithWallet } from "../wallets/wall
 import { amountText, app, esc, wireCopy } from "./shared.js";
 import type { DisplayContext } from "./shared.js";
 
+/** Tiny inline line-icons — decorative, currentColor, no network. They lead
+ *  the detail rows so the card reads as a real checkout, not a spec sheet. */
+const icon = {
+  to: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/><path d="M16 12h.01"/><path d="M3 9V6.5A1.5 1.5 0 0 1 4.5 5H16"/></svg>`,
+  asset: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.4"/></svg>`,
+  memo: `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7l9 9-7 7-9-9V4z"/><circle cx="8" cy="8" r="1.3"/></svg>`,
+  shield: `<svg class="ico ico--inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>`,
+};
+
 /** The request card. Instant to render — no network required. */
 export function renderRequest(request: PaymentRequest, display: DisplayContext): void {
   const wallet = paymentInstructions(request);
@@ -44,51 +53,62 @@ export function renderRequest(request: PaymentRequest, display: DisplayContext):
   const qrOpen = window.matchMedia("(min-width: 640px)").matches;
 
   app().innerHTML = `
-    <div class="card">
-      <h1>${esc(request.label ?? "Payment request")}</h1>
-      ${
-        display.decimals === undefined
-          ? `<p class="amount unknown">${esc(amount)}</p>
-             <p class="note">of <span class="mono">${esc(asset)}</span> — your wallet will show
-             the exact decimal amount before you confirm.</p>`
-          : `<p class="amount">${esc(amount)}</p><p class="note" id="fiat" hidden></p>`
-      }
-      <p class="label">To</p>
-      <p class="account">${esc(displayId)}
-        <span class="chip">${esc(wallet.network)}</span>
-        ${verified ? '<span class="chip ok" translate="no">✓ checksum verified</span>' : ""}
-      </p>
-      <p class="mono secondary">${esc(request.recipient)}</p>
-      ${request.expiresAt !== undefined ? `<p class="note" id="expiry"></p>` : ""}
-      <div class="actions" id="pay-actions">
-        ${walletConfigured() && canPayInPage(wallet.network) ? '<button class="primary" id="pay-now">Pay now</button>' : ""}
-        <a class="button${walletConfigured() && canPayInPage(wallet.network) ? "" : " primary"}" href="${esc(uri)}">Open in wallet</a>
-        <button id="copy">Copy request</button>
+    <div class="card checkout">
+      <div class="checkout__head">
+        <span class="checkout__eyebrow">Payment request</span>
+        <h1>${esc(request.label ?? "Payment request")}</h1>
+        ${
+          display.decimals === undefined
+            ? `<p class="amount unknown">${esc(amount)}</p>
+               <p class="note">of <span class="mono">${esc(asset)}</span> — your wallet will show
+               the exact decimal amount before you confirm.</p>`
+            : `<p class="amount">${esc(amount)}</p><p class="note" id="fiat" hidden></p>`
+        }
       </div>
-      <p class="note error" id="pay-error" hidden></p>
-      ${
-        walletConfigured() && !canPayInPage(wallet.network)
-          ? `<p class="note">In-page <strong>Pay now</strong> is testnet-only while this is a
-             prototype — on ${esc(wallet.network)}, use Copy request or the QR with your own wallet.</p>`
-          : ""
-      }
-      <p class="label">Asset</p>
-      <p class="mono">${esc(asset)}</p>
-      <p class="label">Memo — <strong>required</strong>, or the merchant can't match your payment</p>
-      <p class="mono memo-row">${esc(wallet.memo)} <button class="mini" id="copy-memo">Copy memo</button></p>
-      ${
-        qr === undefined
-          ? `<p class="note">This request is too long for a QR code — use the buttons above.</p>`
-          : `<details class="qr-details"${qrOpen ? " open" : ""}>
-               <summary>QR for your wallet on another device</summary>
-               <div class="qr" role="img" aria-label="payment request QR code">${qr}</div>
-             </details>`
-      }
-      <p class="note">This page can't charge you and never asks for keys or passwords —
-      your wallet always confirms. No app for <span class="mono">hiero-pay:</span> yet?
-      Use Copy request.</p>
+      <div class="checkout__body">
+        <p class="label">${icon.to} To</p>
+        <p class="account">${esc(displayId)}
+          <span class="chip">${esc(wallet.network)}</span>
+          ${verified ? '<span class="chip ok" translate="no">✓ checksum verified</span>' : ""}
+        </p>
+        <p class="mono secondary">${esc(request.recipient)}</p>
+        ${request.expiresAt !== undefined ? `<p class="note" id="expiry"></p>` : ""}
+        <div class="actions" id="pay-actions">
+          ${walletConfigured() && canPayInPage(wallet.network) ? '<button class="primary" id="pay-now">Pay now</button>' : ""}
+          <a class="button${walletConfigured() && canPayInPage(wallet.network) ? "" : " primary"}" href="${esc(uri)}">Open in wallet</a>
+          <button id="copy">Copy request</button>
+        </div>
+        <p class="note error" id="pay-error" hidden></p>
+        ${
+          walletConfigured() && !canPayInPage(wallet.network)
+            ? `<p class="note">In-page <strong>Pay now</strong> is testnet-only while this is a
+               prototype — on ${esc(wallet.network)}, use Copy request or the QR with your own wallet.</p>`
+            : ""
+        }
+        <div class="rows">
+          <div class="row">
+            <p class="label">${icon.asset} Asset</p>
+            <p class="mono">${esc(asset)}</p>
+          </div>
+          <div class="row">
+            <p class="label">${icon.memo} Memo — <strong>required</strong>, or the merchant can't match your payment</p>
+            <p class="mono memo-row">${esc(wallet.memo)} <button class="mini" id="copy-memo">Copy memo</button></p>
+          </div>
+        </div>
+        ${
+          qr === undefined
+            ? `<p class="note">This request is too long for a QR code — use the buttons above.</p>`
+            : `<details class="qr-details"${qrOpen ? " open" : ""}>
+                 <summary>QR for your wallet on another device</summary>
+                 <div class="qr" role="img" aria-label="payment request QR code">${qr}</div>
+               </details>`
+        }
+        <p class="note reassure">${icon.shield}<span>This page can't charge you and never asks for keys or
+        passwords — your wallet always confirms. No app for <span class="mono">hiero-pay:</span> yet?
+        Use Copy request.</span></p>
+      </div>
     </div>
-    <div class="card">
+    <div class="card watch">
       <div class="status await" id="status"><span class="dot"></span><span id="status-text">
       Watching ${esc(wallet.network)} for your payment…</span>
       <span class="checked" id="checked"></span></div>

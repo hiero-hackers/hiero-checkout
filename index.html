@@ -16,14 +16,37 @@
       property="og:description"
       content="Review and pay a Hiero payment request — details stay on your device."
     />
-    <meta name="theme-color" content="#4f46e5" />
+    <meta name="theme-color" content="#5b54ef" />
     <link
       rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⬒</text></svg>"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%235b54ef'/><stop offset='1' stop-color='%238b5cf6'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='url(%23g)'/><text x='50' y='50' font-size='60' font-family='Georgia,serif' font-style='italic' font-weight='700' fill='%23fff' text-anchor='middle' dominant-baseline='central'>&#8463;</text></svg>"
     />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
+    <header class="appbar">
+      <a class="appbar__brand" href="./">
+        <span class="appbar__mark" aria-hidden="true">&#8463;</span>
+        <span class="appbar__name">Hiero <span>Checkout</span></span>
+      </a>
+      <span class="appbar__trust">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3z" />
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+        Self-custody · no keys
+      </span>
+    </header>
     <main id="app" aria-live="polite"></main>
     <footer>
       <p>

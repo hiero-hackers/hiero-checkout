@@ -1,70 +1,209 @@
 /* SPDX-License-Identifier: Apache-2.0 */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Design tokens. One place to argue color, depth, and rhythm; every rule
+   below reads from here. Semantic hues carry an -rgb triplet too, so status
+   tints are one alpha away and dark mode only re-points the triplet.
+   ───────────────────────────────────────────────────────────────────────── */
 :root {
-  --ink: #1a1a24;
-  --muted: #6b6b7b;
-  --paper: #f6f6f9;
+  --ink: #14141d;
+  --ink-soft: #3a3a48;
+  --muted: #6a6a7b;
+  --faint: #9494a6;
+
+  --paper: #f3f3f8;
   --card: #ffffff;
-  --line: #e3e3ea;
-  --accent: #4f46e5;
+  --surface: #f6f6fb;
+  --surface-2: #eeeef5;
+  --line: #e7e7ef;
+  --line-strong: #d8d8e2;
+
+  --accent: #5b54ef;
+  --accent-strong: #4840d4;
+  --accent-2: #9b5cf6;
+  --accent-rgb: 91 84 239;
+
   --good: #0a7d33;
+  --good-rgb: 10 125 51;
   --warn: #b45309;
-  --bad: #b3261e;
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    sans-serif;
+  --warn-rgb: 180 83 9;
+  --bad: #c0261a;
+  --bad-rgb: 192 38 26;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-xs: 9px;
+
+  --shadow-sm: 0 1px 2px rgb(20 20 35 / 0.06);
+  --shadow-md: 0 1px 2px rgb(20 20 35 / 0.05), 0 14px 34px -16px rgb(20 20 35 / 0.18);
+  --shadow-lg: 0 2px 4px rgb(20 20 35 / 0.05), 0 30px 60px -24px rgb(20 20 35 / 0.28);
+  --shadow-accent:
+    0 1px 2px rgb(var(--accent-rgb) / 0.3), 0 12px 24px -8px rgb(var(--accent-rgb) / 0.46);
+
+  --grad: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  font-family: var(--font);
+  color-scheme: light dark;
 }
 * {
   box-sizing: border-box;
 }
+
+/* ── Page shell — a calm violet aura lifts the surface off a flat field ── */
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--paper);
+  background:
+    radial-gradient(1100px 560px at 50% -10%, rgb(var(--accent-rgb) / 0.12), transparent 60%),
+    radial-gradient(820px 520px at 100% 0%, rgb(155 92 246 / 0.09), transparent 55%), var(--paper);
   color: var(--ink);
   display: flex;
   flex-direction: column;
   align-items: center;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.5;
 }
+
+/* ── App bar — the brand shell that makes this read as a product ── */
+.appbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem clamp(1rem, 4vw, 2rem);
+  border-bottom: 1px solid var(--line);
+  background: rgb(255 255 255 / 0.72);
+  -webkit-backdrop-filter: saturate(1.6) blur(12px);
+  backdrop-filter: saturate(1.6) blur(12px);
+}
+.appbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--ink);
+}
+.appbar__mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--grad);
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: var(--shadow-accent);
+}
+.appbar__name {
+  font-weight: 650;
+  font-size: 0.98rem;
+  letter-spacing: -0.01em;
+}
+.appbar__name span {
+  color: var(--accent);
+}
+.appbar__trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--good);
+  background: rgb(var(--good-rgb) / 0.1);
+  border: 1px solid rgb(var(--good-rgb) / 0.25);
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+}
+@media (max-width: 420px) {
+  .appbar__trust {
+    display: none;
+  }
+}
+
 main {
-  width: min(28rem, 100vw - 2rem);
+  width: min(29rem, 100vw - 2rem);
   margin: 2.5rem 0 1rem;
 }
 footer {
-  margin: auto 0 1.5rem;
-  max-width: 26rem;
+  margin: auto 0 1.75rem;
+  max-width: 27rem;
   text-align: center;
   color: var(--muted);
   font-size: 0.75rem;
+  line-height: 1.6;
+  padding: 0 1rem;
 }
+footer code {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+/* ── Card — the surface everything lives on. A hairline, a soft float, and a
+      one-shot entrance so each state settles in rather than snapping. ── */
 .card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-md);
+  animation: rise 0.42s cubic-bezier(0.22, 0.7, 0.2, 1) both;
 }
 .card + .card {
   margin-top: 1rem;
 }
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Type scale ── */
 h1 {
-  font-size: 1.05rem;
-  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  margin: 0 0 0.35rem;
 }
 .label {
   color: var(--muted);
-  font-size: 0.8rem;
-  margin: 0.9rem 0 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin: 1.2rem 0 0.35rem;
+}
+.label .ico {
+  vertical-align: -0.15em;
+  margin-right: 0.35rem;
+  color: var(--accent);
+}
+.label strong {
+  color: var(--ink-soft);
 }
 .amount {
-  font-size: 2rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  font-variant-numeric: tabular-nums;
+  margin: 0.15rem 0 0;
 }
 .mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--mono);
   font-size: 0.85rem;
   word-break: break-all;
 }
@@ -72,71 +211,236 @@ h1 {
   color: var(--accent);
   font-weight: 600;
 }
+.ico {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  opacity: 0.9;
+}
+
+/* ── Checkout card — the money moment gets a gradient hero header, then the
+      details sit in a clean panel below. This is the screen payers judge. ── */
+.checkout {
+  padding: 0;
+  overflow: hidden;
+}
+.checkout__head {
+  position: relative;
+  padding: 1.6rem 1.75rem 1.7rem;
+  background: var(--grad);
+  color: #fff;
+  overflow: hidden;
+}
+.checkout__head::after {
+  /* a soft top-light so the gradient has depth, not a flat fill */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 15% -20%, rgb(255 255 255 / 0.28), transparent 55%);
+  pointer-events: none;
+}
+.checkout__eyebrow {
+  display: inline-block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgb(255 255 255 / 0.18);
+  border: 1px solid rgb(255 255 255 / 0.28);
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+}
+.checkout__head h1 {
+  font-size: 1.02rem;
+  font-weight: 550;
+  color: rgb(255 255 255 / 0.92);
+  margin: 0.85rem 0 0.1rem;
+}
+.checkout__head .amount {
+  color: #fff;
+  font-size: 2.9rem;
+  margin: 0.3rem 0 0;
+}
+.checkout__head .amount.unknown {
+  font-size: 1.6rem;
+  color: rgb(255 255 255 / 0.85);
+}
+.checkout__head .note {
+  color: rgb(255 255 255 / 0.82);
+  margin-top: 0.5rem;
+}
+.checkout__head .mono {
+  color: #fff;
+}
+.checkout__body {
+  padding: 0.4rem 1.75rem 1.75rem;
+}
+.checkout__body > .label:first-child {
+  margin-top: 1.2rem;
+}
+
+/* ── QR ── */
 .qr {
   display: block;
-  width: 200px;
+  width: 208px;
   margin: 1.1rem auto 0.4rem;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
 }
 .qr svg {
   width: 100%;
   height: auto;
   display: block;
 }
+
+/* ── Buttons — primary is a violet lift and claims the full row; the rest
+      are quiet, equal-width, and lift only on hover ── */
 .actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+}
+.actions .primary {
+  flex-basis: 100%;
 }
 button,
 .button {
   flex: 1;
-  padding: 0.65rem 0.9rem;
-  border-radius: 9px;
-  border: 1px solid var(--line);
+  padding: 0.72rem 0.95rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line-strong);
   background: var(--card);
   color: var(--ink);
   font: inherit;
   font-size: 0.9rem;
+  font-weight: 550;
   cursor: pointer;
   text-align: center;
   text-decoration: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.18s ease,
+    background 0.16s ease,
+    border-color 0.16s ease,
+    filter 0.16s ease;
+}
+button:hover,
+.button:hover {
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+button:active,
+.button:active {
+  transform: translateY(0);
 }
 button.primary,
 .button.primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background-image: var(--grad);
+  border-color: transparent;
   color: #fff;
+  font-weight: 600;
+  box-shadow: var(--shadow-accent);
 }
+button.primary:hover,
+.button.primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 4px rgb(var(--accent-rgb) / 0.32),
+    0 16px 30px -8px rgb(var(--accent-rgb) / 0.52);
+}
+button.primary:active,
+.button.primary:active {
+  filter: brightness(0.97);
+  transform: translateY(0);
+}
+
+/* ── Detail rows — a bordered panel with divided rows reads as a receipt ── */
+.rows {
+  margin-top: 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--card);
+}
+.row {
+  padding: 0.9rem 1rem;
+}
+.row + .row {
+  border-top: 1px solid var(--line);
+}
+.row .label {
+  margin: 0 0 0.35rem;
+}
+.row .mono {
+  margin: 0;
+}
+
+/* ── Live status row — a tinted state chip, not a bare line ── */
 .status {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  font-size: 0.9rem;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  font-weight: 550;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface);
 }
 .dot {
   width: 9px;
   height: 9px;
+  flex: 0 0 auto;
   border-radius: 50%;
   background: var(--muted);
+  box-shadow: 0 0 0 4px rgb(106 106 123 / 0.14);
+}
+.status.await {
+  color: var(--warn);
+  border-color: rgb(var(--warn-rgb) / 0.28);
+  background: rgb(var(--warn-rgb) / 0.08);
 }
 .status.await .dot {
   background: var(--warn);
-  animation: pulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 0 4px rgb(var(--warn-rgb) / 0.18);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.status.paid {
+  color: var(--good);
+  border-color: rgb(var(--good-rgb) / 0.3);
+  background: rgb(var(--good-rgb) / 0.09);
 }
 .status.paid .dot {
   background: var(--good);
+  box-shadow: 0 0 0 4px rgb(var(--good-rgb) / 0.2);
+}
+.status.problem {
+  color: var(--bad);
+  border-color: rgb(var(--bad-rgb) / 0.3);
+  background: rgb(var(--bad-rgb) / 0.08);
 }
 .status.problem .dot {
   background: var(--bad);
+  box-shadow: 0 0 0 4px rgb(var(--bad-rgb) / 0.2);
 }
 @keyframes pulse {
   50% {
-    opacity: 0.35;
+    opacity: 0.4;
+    transform: scale(0.88);
   }
 }
 .verdict {
   font-size: 1.2rem;
   font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0.95rem 0 0.2rem;
 }
 .verdict.good {
   color: var(--good);
@@ -147,118 +451,146 @@ button.primary,
 .error {
   color: var(--bad);
 }
+
+/* ── Inputs ── */
 textarea {
   width: 100%;
   min-height: 5.5rem;
-  font-family: ui-monospace, monospace;
+  font-family: var(--mono);
   font-size: 0.8rem;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  padding: 0.6rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  padding: 0.7rem;
   resize: vertical;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.18);
 }
 .note {
   color: var(--muted);
-  font-size: 0.8rem;
-  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin-top: 0.8rem;
+}
+.note.reassure {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  margin-top: 1.2rem;
+}
+.ico--inline {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin-top: 0.05rem;
+  color: var(--good);
+  opacity: 1;
 }
 
 /* ── Trust chips, account display, memo row ── */
 .account {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 1.15rem;
+  font-family: var(--mono);
+  font-size: 1.22rem;
   font-weight: 650;
   margin: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 .chip {
-  font-family: system-ui, sans-serif;
-  font-size: 0.7rem;
+  font-family: var(--font);
+  font-size: 0.68rem;
   font-weight: 600;
-  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.01em;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
-  background: var(--paper);
+  background: var(--surface-2);
   border: 1px solid var(--line);
   color: var(--muted);
   white-space: nowrap;
+  line-height: 1.4;
 }
 .chip.ok {
-  background: #e7f5ec;
-  border-color: #bfe3cd;
+  background: rgb(var(--good-rgb) / 0.1);
+  border-color: rgb(var(--good-rgb) / 0.28);
   color: var(--good);
 }
 .secondary {
   color: var(--muted);
-  font-size: 0.72rem;
-  margin-top: 0.2rem;
+  font-size: 0.74rem;
+  margin-top: 0.3rem;
 }
 .amount.unknown {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   color: var(--muted);
 }
 .memo-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   flex-wrap: wrap;
+  margin: 0;
 }
 button.mini {
   flex: 0 0 auto;
   font-size: 0.72rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
+  font-weight: 600;
+  padding: 0.32rem 0.65rem;
+  border-radius: 7px;
 }
-.qr-details summary {
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin-top: 0.9rem;
-}
+.qr-details summary,
 .tech summary {
   cursor: pointer;
   color: var(--muted);
   font-size: 0.85rem;
+  font-weight: 550;
+  list-style: none;
+  padding: 0.2rem 0;
+  transition: color 0.16s ease;
+}
+.qr-details {
+  margin-top: 1.2rem;
+}
+.qr-details summary::-webkit-details-marker,
+.tech summary::-webkit-details-marker {
+  display: none;
+}
+.qr-details summary::before,
+.tech summary::before {
+  content: "›";
+  display: inline-block;
+  margin-right: 0.45rem;
+  font-weight: 700;
+  transition: transform 0.18s ease;
+}
+.qr-details[open] > summary::before,
+.tech[open] > summary::before {
+  transform: rotate(90deg);
+}
+.qr-details summary:hover,
+.tech summary:hover {
+  color: var(--accent);
 }
 .expired {
   color: var(--bad);
   font-weight: 600;
 }
 
-/* ── Dark mode (the QR stays light — scanners need contrast) ── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #e8e8ef;
-    --muted: #9a9aac;
-    --paper: #131318;
-    --card: #1c1c24;
-    --line: #2c2c38;
-    --accent: #7c74f2;
-    --good: #4cc27a;
-    --warn: #e0a34e;
-    --bad: #e57373;
-  }
-  .chip.ok {
-    background: #16321f;
-    border-color: #234730;
-  }
-  .qr {
-    background: #fff;
-    padding: 8px;
-    border-radius: 8px;
-  }
-  .card {
-    box-shadow: none;
-  }
-}
-
 /* ── Builder form, proof list, small QR, motion & focus ── */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.7rem 0.8rem;
+  gap: 0.95rem 0.85rem;
+  margin-top: 1.3rem;
 }
 .grid label[hidden] {
   /* display:flex below would defeat the hidden attribute — be explicit */
@@ -267,9 +599,13 @@ button.mini {
 .grid label {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.78rem;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
   color: var(--muted);
+  margin: 0;
 }
 .grid label,
 .grid input,
@@ -284,11 +620,33 @@ button.mini {
   width: 100%;
   font: inherit;
   font-size: 0.9rem;
+  font-weight: 450;
   color: var(--ink);
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.5rem 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  padding: 0.6rem 0.65rem;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.grid input::placeholder {
+  color: var(--faint);
+}
+.grid input:focus,
+.grid select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.18);
+}
+.grid select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%236a6a7b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+  cursor: pointer;
 }
 @media (max-width: 480px) {
   .grid {
@@ -296,20 +654,22 @@ button.mini {
   }
 }
 .proofs {
-  margin: 0.2rem 0 0;
+  margin: 0.35rem 0 0;
   padding-left: 1.1rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--mono);
   font-size: 0.78rem;
   word-break: break-all;
+  line-height: 1.7;
 }
 .proofs a {
   color: var(--accent);
 }
 .qr.small {
-  width: 150px;
+  width: 160px;
 }
 a {
   color: var(--accent);
+  text-underline-offset: 2px;
 }
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -317,8 +677,9 @@ a {
   border-radius: 4px;
 }
 @media (prefers-reduced-motion: reduce) {
-  .status.await .dot {
-    animation: none;
+  * {
+    animation: none !important;
+    transition: none !important;
   }
 }
 
@@ -328,26 +689,29 @@ a {
   top: 0;
   z-index: 10;
   width: 100%;
-  background: var(--warn);
+  background: var(--grad);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1rem;
+  box-shadow: 0 2px 12px -4px rgb(var(--accent-rgb) / 0.5);
 }
 .steps {
-  margin: 0.6rem 0 0.9rem;
+  margin: 0.7rem 0 0.9rem;
   padding-left: 1.2rem;
   color: var(--muted);
   font-size: 0.85rem;
+  line-height: 1.6;
 }
 .steps li {
-  margin: 0.2rem 0;
+  margin: 0.25rem 0;
 }
 .checked {
   margin-left: auto;
-  color: var(--muted);
+  color: var(--faint);
   font-size: 0.72rem;
+  font-weight: 500;
   white-space: nowrap;
 }
 .ref-row {
@@ -360,8 +724,193 @@ a {
   min-width: 0;
 }
 
+/* ── Landing role chooser ── */
+.landing__hero {
+  margin-bottom: 1.5rem;
+}
+.landing__hero h1 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+.tagline {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0.5rem 0 0;
+}
+.tagline .chip {
+  vertical-align: middle;
+}
+.roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+@media (max-width: 480px) {
+  .roles {
+    grid-template-columns: 1fr;
+  }
+}
+.role {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 1.15rem;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+.role:hover {
+  border-color: rgb(var(--accent-rgb) / 0.4);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+.role__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgb(var(--accent-rgb) / 0.12);
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.role__icon svg {
+  width: 20px;
+  height: 20px;
+}
+.role h2 {
+  font-size: 1rem;
+  font-weight: 650;
+  margin: 0 0 0.4rem;
+}
+.role .note {
+  flex: 1;
+  margin-top: 0;
+}
+.role .actions {
+  margin-top: 1rem;
+}
+.role textarea {
+  margin-top: 0.6rem;
+}
+.center {
+  text-align: center;
+  margin-top: 1.3rem;
+}
+button.linklike {
+  all: unset;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.brand {
+  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 550;
+}
+.brand a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+.brand a:hover {
+  color: var(--accent);
+}
+
+/* ── Invoice view — the request rendered as paper ── */
+.inv-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.6rem;
+}
+.inv-head h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.inv-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 0.6rem;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  font-weight: 450;
+  letter-spacing: normal;
+  text-transform: none;
+  min-height: 0.9rem;
+}
+
+.actions.bottom {
+  margin-top: 1.3rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+/* ── Dark mode (the QR stays light — scanners need the contrast) ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ececf3;
+    --ink-soft: #c4c4d2;
+    --muted: #9a9aae;
+    --faint: #6f6f84;
+
+    --paper: #0d0d13;
+    --card: #191921;
+    --surface: #20202a;
+    --surface-2: #262632;
+    --line: #2b2b38;
+    --line-strong: #3a3a49;
+
+    --accent: #8b83ff;
+    --accent-strong: #a29bff;
+    --accent-2: #b072f6;
+    --accent-rgb: 139 131 255;
+
+    --good: #4cc27a;
+    --good-rgb: 76 194 122;
+    --warn: #e0a34e;
+    --warn-rgb: 224 163 78;
+    --bad: #e57373;
+    --bad-rgb: 229 115 115;
+
+    --shadow-md: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px -18px rgb(0 0 0 / 0.7);
+    --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.5), 0 34px 60px -22px rgb(0 0 0 / 0.85);
+  }
+  body {
+    background:
+      radial-gradient(1100px 560px at 50% -10%, rgb(var(--accent-rgb) / 0.16), transparent 58%),
+      radial-gradient(820px 520px at 100% 0%, rgb(176 114 246 / 0.1), transparent 55%), var(--paper);
+  }
+  .appbar {
+    background: rgb(16 16 22 / 0.6);
+    border-bottom-color: var(--line);
+  }
+  .grid select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%239a9aae' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+}
+
 /* ── Print: the request card is the artifact; everything else is chrome ── */
 @media print {
+  .appbar,
   footer,
   .actions,
   #status,
@@ -376,6 +925,30 @@ a {
   .card {
     border: none;
     box-shadow: none;
+    animation: none;
+  }
+  .checkout__head {
+    background: #fff !important;
+    color: #000 !important;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .checkout__head::after {
+    display: none;
+  }
+  .checkout__head h1,
+  .checkout__head .amount,
+  .checkout__head .note {
+    color: #000 !important;
+  }
+  .checkout__eyebrow {
+    color: #000 !important;
+    background: none;
+    border-color: #999;
+  }
+  .checkout__body {
+    padding-left: 0;
+    padding-right: 0;
   }
   .qr-details {
     display: block;
@@ -386,75 +959,6 @@ a {
   .qr-details .qr {
     display: block !important;
   }
-}
-
-/* ── Landing role chooser ── */
-.tagline {
-  color: var(--muted);
-  margin: 0.2rem 0 1rem;
-}
-.roles {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-@media (max-width: 480px) {
-  .roles {
-    grid-template-columns: 1fr;
-  }
-}
-.role {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 0.9rem;
-}
-.role h2 {
-  font-size: 0.95rem;
-  margin: 0 0 0.35rem;
-}
-.role textarea {
-  margin-top: 0.5rem;
-}
-.center {
-  text-align: center;
-  margin-top: 1rem;
-}
-button.linklike {
-  all: unset;
-  color: var(--accent);
-  cursor: pointer;
-  text-decoration: underline;
-}
-.brand {
-  margin: 0 0 0.6rem;
-  font-size: 0.8rem;
-}
-.brand a {
-  color: var(--muted);
-  text-decoration: none;
-}
-
-/* ── Invoice view ── */
-.inv-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  border-bottom: 2px solid var(--ink);
-  padding-bottom: 0.5rem;
-}
-.inv-head h1 {
-  font-size: 1.4rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.inv-meta {
-  display: flex;
-  gap: 1rem;
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin-top: 0.5rem;
-}
-@media print {
   .no-print,
   .brand {
     display: none !important;
@@ -462,16 +966,4 @@ button.linklike {
   .invoice .qr {
     display: block !important;
   }
-}
-
-.hint {
-  color: var(--muted);
-  font-size: 0.72rem;
-  min-height: 0.9rem;
-}
-
-.actions.bottom {
-  margin-top: 1.2rem;
-  border-top: 1px solid var(--line);
-  padding-top: 0.9rem;
 }
